@@ -70,7 +70,8 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
     private class IOClassicWatchFaceEngine extends CanvasWatchFaceService.Engine {
         private final int MSG_UPDATE_TIME = 0;
         private final float TWO_PI = (float) Math.PI * 2f;
-        private final float THICK_STROKE = 7f;
+        //private final float THICK_STROKE = 7f;
+        private final float THICK_STROKE = 8f;
         private final float MINUTE_TICK_STROKE = 2f;
         private final float SECOND_HAND_STROKE = 3f;
         private final float AMBIENT_STROKE = 2f;
@@ -114,6 +115,7 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
         private Paint mMinuteTickPaint;
         private Paint mOuterBackgroundPaint;
         private TextPaint mHourLabelTextPaint;
+        private Paint mKetyiTextPaint;
 
         //Colors for each complication component
         private int mComplicationColor;
@@ -138,6 +140,8 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
                 = Typeface.create("sans-serif-light", Typeface.NORMAL);
         private final Typeface mHourLabelFont
                 = Typeface.create("sans-serif-medium", Typeface.NORMAL);
+
+        private Typeface normalTypeface;
 
         //Other settings
         private boolean mShowComplicationBorder;
@@ -168,6 +172,8 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
         @Override
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
+
+            normalTypeface = Typeface.createFromAsset(getAssets(), "AmaticSC-Regular.ttf");
 
             mContext = getApplicationContext();
 
@@ -231,6 +237,12 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
             mBackgroundPaint.setColor(mCenterCircleColor);
             mBackgroundPaint.setAntiAlias(true);
 
+            mKetyiTextPaint = new Paint();
+            mKetyiTextPaint.setColor(mSecondHandColor);
+            mKetyiTextPaint.setTextAlign(Paint.Align.CENTER);
+            mKetyiTextPaint.setTypeface(normalTypeface);
+            mKetyiTextPaint.setAntiAlias(true);
+
             //Circle that holds the ticks
             mCircleAndTickPaint = new Paint();
             mCircleAndTickPaint.setColor(mCircleAndTickColor);
@@ -250,7 +262,7 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
             mOuterBackgroundPaint.setAntiAlias(true);
 
             mHourLabelTextPaint = new TextPaint();
-            mHourLabelTextPaint.setColor(mHourLabelsColor);
+            mHourLabelTextPaint.setColor(mNotificationTextColor);
             mHourLabelTextPaint.setTextAlign(Paint.Align.CENTER);
             mHourLabelTextPaint.setTypeface(mHourLabelFont);
             mHourLabelTextPaint.setAntiAlias(true);
@@ -315,7 +327,10 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
 
             drawBackground(canvas, bounds);
 
-            drawComplications(canvas, now);
+            if (!mAmbient) {
+                canvas.drawText("ketyi", mCenterX, 120f, mKetyiTextPaint);
+                drawComplications(canvas, now);
+            }
 
             if (mShowSecondHand && !mAmbient) {
                 drawSecondHand(canvas);
@@ -323,7 +338,7 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
             drawMinuteHand(canvas);
             drawHourHand(canvas);
 
-            if (mShowNotificationIndicator) {
+            if (mShowNotificationIndicator && !mAmbient) {
                 drawNotificationCount(canvas);
             }
         }
@@ -497,7 +512,8 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
             final float hourRotation = hours / 12f * TWO_PI;
 
             final float hourOverflow = 10f;
-            final float hourHandLength = mCenterX - 95;
+            //final float hourHandLength = mCenterX - 95;
+            final float hourHandLength = 0.8f * mCenterX;
 
             float hourX = (float) Math.sin(hourRotation);
             float hourY = (float) -Math.cos(hourRotation);
@@ -519,7 +535,8 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
             final float minuteRotation = minutes / 60f * TWO_PI;
 
             final float minuteOverflow = 10f;
-            final float minuteHandLength = mCenterX - 65;
+            //final float minuteHandLength = mCenterX - 65;
+            final float minuteHandLength = mCenterX;;
 
             final float minuteX = (float) Math.sin(minuteRotation);
             final float minuteY = (float) -Math.cos(minuteRotation);
@@ -540,7 +557,8 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
             float secondRotation = seconds / 60f * TWO_PI;
 
             final float secondOverflow = 16f;
-            final float secondHandLength = mCenterX - 60;
+            //final float secondHandLength = mCenterX - 60;
+            final float secondHandLength = mCenterX;
 
             final float secondX = (float) Math.sin(secondRotation);
             final float secondY = (float) -Math.cos(secondRotation);
@@ -789,6 +807,8 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
             mCenterX = width / 2;
             mCenterY = height / 2;
 
+            mKetyiTextPaint.setTextSize(width / 3);
+
             mHourLabelTextPaint.setTextSize(width / 15);
 
             //Handle measuring the notification text
@@ -832,10 +852,10 @@ public class IOClassicWatchFaceService extends CanvasWatchFaceService {
                 mOuterBackgroundPaint.setColor(Color.BLACK);
 
                 mHourPaint.setColor(Color.WHITE);
-                mHourPaint.setStrokeWidth(AMBIENT_STROKE);
+                //mHourPaint.setStrokeWidth(AMBIENT_STROKE);
 
                 mMinutePaint.setColor(Color.WHITE);
-                mMinutePaint.setStrokeWidth(AMBIENT_STROKE);
+                //mMinutePaint.setStrokeWidth(AMBIENT_STROKE);
 
                 if (mShowSecondHand) {
                     mSecondPaint.setColor(Color.WHITE);
